@@ -1,0 +1,34 @@
+import boto3
+import json
+
+# SageMaker Runtime client
+runtime = boto3.client('sagemaker-runtime', region_name='us-east-1')
+
+def lambda_handler(event, context):
+    # Input for the model (example: historical demand data)
+    payload = json.dumps(event['input_data'])
+    
+    # Invoke SageMaker endpoint
+    response = runtime.invoke_endpoint(
+        EndpointName='BloodDemandPredictor',
+        ContentType='application/json',
+        Body=payload
+    )
+    
+    # Parse model response
+    result = json.loads(response['Body'].read())
+    forecasted_demand = result['predicted_demand']
+    
+    return {
+        'statusCode': 200,
+        'body': json.dumps({
+            'forecasted_demand': forecasted_demand
+        })
+    }
+{
+  "input_data": {
+    "historical_data": [120, 130, 125, 140, 150],  # Past demand data
+    "external_factors": {"season": "winter", "event": "holiday"}
+  }
+}
+
