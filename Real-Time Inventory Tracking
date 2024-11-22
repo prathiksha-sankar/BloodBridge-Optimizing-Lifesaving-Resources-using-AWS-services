@@ -1,0 +1,35 @@
+import boto3
+import json
+
+# Thresholds
+TEMPERATURE_THRESHOLD = (2, 6)  # Ideal range in °C
+HUMIDITY_THRESHOLD = (50, 80)  # Ideal range in %
+
+# SNS for alerts
+sns = boto3.client('sns', region_name='us-east-1')
+
+def lambda_handler(event, context):
+    # Parse IoT data
+    device_id = event['device_id']
+    temperature = event['temperature']
+    humidity = event['humidity']
+    
+    # Check thresholds
+    if not (TEMPERATURE_THRESHOLD[0] <= temperature <= TEMPERATURE_THRESHOLD[1]):
+        alert_message = f"Alert: Temperature out of range in {device_id}. Current: {temperature}°C"
+        sns.publish(
+            TopicArn="arn:aws:sns:us-east-1:123456789012:BloodStorageAlerts",
+            Message=alert_message
+        )
+    
+    if not (HUMIDITY_THRESHOLD[0] <= humidity <= HUMIDITY_THRESHOLD[1]):
+        alert_message = f"Alert: Humidity out of range in {device_id}. Current: {humidity}%"
+        sns.publish(
+            TopicArn="arn:aws:sns:us-east-1:123456789012:BloodStorageAlerts",
+            Message=alert_message
+        )
+    
+    return {
+        'statusCode': 200,
+        'body': json.dumps('Monitoring complete!')
+    }
