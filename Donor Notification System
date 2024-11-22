@@ -1,0 +1,23 @@
+import boto3
+import json
+
+# Initialize SNS client
+sns = boto3.client('sns', region_name='us-east-1')
+
+def lambda_handler(event, context):
+    # Event includes donor data and message
+    message = event['message']
+    phone_numbers = event['phone_numbers']  # List of donor phone numbers
+    
+    # Loop through phone numbers to send notifications
+    for phone in phone_numbers:
+        response = sns.publish(
+            PhoneNumber=phone,
+            Message=message
+        )
+        print(f"Notification sent to {phone}: {response['MessageId']}")
+    
+    return {
+        'statusCode': 200,
+        'body': json.dumps('Notifications sent successfully!')
+    }
