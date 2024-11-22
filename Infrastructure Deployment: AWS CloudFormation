@@ -1,0 +1,16 @@
+Resources:
+  SNSBloodStorageAlerts:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: BloodStorageAlerts
+
+  LambdaSendNotifications:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: SendDonorNotifications
+      Handler: index.lambda_handler
+      Runtime: python3.9
+      Role: arn:aws:iam::123456789012:role/LambdaExecutionRole
+      Code:
+        S3Bucket: my-code-bucket
+        S3Key: send_notifications.zip
